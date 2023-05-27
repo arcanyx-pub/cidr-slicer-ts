@@ -1,0 +1,2 @@
+# This file overrides .gitignore when publishing to NPM. And that's what we want, because the dist/
+# folder should be included in the upload rather than ignored.
