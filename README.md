@@ -1,5 +1,5 @@
-# Cidr Slicer 🔪🍎
-=====
+Cidr Slicer 🔪🍎
+================
 
 [![npm](https://img.shields.io/npm/v/@arcanyx/cidr-slicer)](https://www.npmjs.com/package/@arcanyx/cidr-slicer)
 
