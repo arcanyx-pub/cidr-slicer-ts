@@ -2,6 +2,7 @@ Cidr Slicer 🔪🍎
 ================
 
 [![npm](https://img.shields.io/npm/v/@arcanyx/cidr-slicer)](https://www.npmjs.com/package/@arcanyx/cidr-slicer)
+[![main](https://github.com/arcanyx-pub/cidr-slicer-ts/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/arcanyx-pub/cidr-slicer-ts/actions?query=branch%3Amain)
 
 Tiny zero-dependency lib for manipulating CIDR blocks in both IPv4 and IPv6. Written in TypeScript.
 
