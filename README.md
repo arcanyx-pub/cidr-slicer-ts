@@ -12,10 +12,6 @@ npm install @arcanyx/cidr-slicer
 
 **CAUTION**: This is an early version with several limitations:
  - No IPv4 support.
- - Insufficient test coverage.
- - Not performance-optimized.
- - API will almost certainly change in v1.
- - Contributions welcome!
 
 Features:
  - Parse an IPv6 address (e.g., `2001:db8::`) into a 128-bit BigInt.
@@ -31,22 +27,23 @@ Use cases:
 ### General Usage
 
 ```typescript
-import {parseCidrBlockV6, CidrBlockV6} from "cidr-slicer";
+import {ipv6CidrBlockFromString} from "cidr-slicer";
 
-const block: CidrBlockV6 = parseCidrBlockV6("2001:db8::/56");
+// Slice a /56 block into /64 block slices.
+const block = ipv6CidrBlockFromString("2001:db8::/56");  // Type: Ipv6CidrBlock
+const slices = block.slice(64);  // Type: Ipv6CiderBlockSlices
 
-for (let i = 0; i < 3; i++) {
-    // Slice the /56 block into smaller /64 blocks and get the i'th block.
-    const slice: CidrBlockV6 = block.slice(64, i);
+for (let i = 0; i < slices.length; i++) {
+   // Get and print the i'th block slice.
+    const slice = slices.get(i);  // Type: Ipv6CidrBlock
     console.log(slice.toCanonicalString());
 }
-// Outputs:
+// Console output:
 //  2001:db8::/64
 //  2001:db8:0:1::/64
 //  2001:db8:0:2::/64
-
-// Throws an error because there are only 256 /64 blocks in a /56 block:
-const slice = block.slice(64, 256);  // throws!
+//  [...]
+//  2001:db8:0:ff::/64
 ```
 
 ### Assigning IPv6 blocks to AWS subnets with AWS CDK
