@@ -1,0 +1,14 @@
+root: true
+plugins:
+  - "@typescript-eslint"
+parser: "@typescript-eslint/parser"
+parserOptions:
+  project: true
+  tsconfigRootDir: __dirname
+
+extends:
+  - "@arcanyx/eslint-config-ts"
+
+ignorePatterns:
+  - "/*"
+  - "!/src"
