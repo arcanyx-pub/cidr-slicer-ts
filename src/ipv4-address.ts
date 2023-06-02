@@ -13,7 +13,7 @@ export type Ipv4Address = {
     /** Apply a mask using the given prefix length. */
     readonly mask: (prefixLength: number) => Ipv4Address,
     /** Convert to canonical string format, e.g., "192.0.2.0". */
-    readonly toCanonicalString: () => string,
+    readonly toString: () => string,
     /** Returns the numeric representation, in the range [0, 2^32) */
     readonly toNumber: () => number,
 };
@@ -65,7 +65,7 @@ export function ipv4AddressFromInt(intValue: number): Ipv4Address {
             return ipv4AddressFromInt(newVal);
         },
 
-        toCanonicalString: () => ipv4ToCanonicalString(intValue),
+        toString: () => ipv4ToCanonicalString(intValue),
         toNumber: () => (intValue + MAX_UINT32) % MAX_UINT32,
     };
 }
