@@ -1,10 +1,11 @@
-interface ToString {
+interface IpAddress {
     readonly toString: () => string,
+    readonly mask: (prefixLength: number) => this,
 }
 
-export interface CidrBlock<IpAddress, CidrBlockSlices> {
+export interface CidrBlock<IP, SLICES> {
     /** The normalized address, with all bits right of the prefix set to 0. */
-    readonly address: IpAddress,
+    readonly address: IP,
     /** The prefix length specified by the notation, e.g., 60 for "2001:db8::/60". */
     readonly prefixLength: number,
     /**
@@ -12,17 +13,17 @@ export interface CidrBlock<IpAddress, CidrBlockSlices> {
      *
      * slicePrefixLength must be <= block.prefixLength.
      */
-    readonly slice: (slicePrefixLength: number) => CidrBlockSlices,
+    readonly slice: (slicePrefixLength: number) => SLICES,
     /** Returns the canonical string representation of the CIDR block (with proper elision) */
     readonly toString: () => string,
 }
 
-export function cidrBlockFromString<IpAddress extends ToString, CidrBlockSlices>(
+export function cidrBlockFromString<IP extends IpAddress, SLICES>(
     block: string,
     maxPrefixLength: number,
-    ipAddressFromString: (addrStr: string) => IpAddress,
-    slice: (block: CidrBlock<IpAddress, CidrBlockSlices>, slicePrefixLength: number) => CidrBlockSlices,
-): CidrBlock<IpAddress, CidrBlockSlices> {
+    ipAddressFromString: (addrStr: string) => IP,
+    slice: (block: CidrBlock<IP, SLICES>, slicePrefixLength: number) => SLICES,
+): CidrBlock<IP, SLICES> {
     if (block.length === 0) {
         throw new Error("Cannot parse empty block");
     }
@@ -46,17 +47,19 @@ export function cidrBlockFromString<IpAddress extends ToString, CidrBlockSlices>
     return createCidrBlock(addr, prefixLength, maxPrefixLength, slice);
 }
 
-export function createCidrBlock<IpAddress extends ToString, CidrBlockSlices>(
-    address: IpAddress,
+export function createCidrBlock<IP extends IpAddress, SLICES>(
+    address: IP,
     prefixLength: number,
     maxPrefixLength: number,
-    slice: (block: CidrBlock<IpAddress, CidrBlockSlices>, slicePrefixLength: number) => CidrBlockSlices,
-): CidrBlock<IpAddress, CidrBlockSlices> {
-    const toString = () => `${address.toString()}/${prefixLength}`;
+    slice: (block: CidrBlock<IP, SLICES>, slicePrefixLength: number) => SLICES,
+): CidrBlock<IP, SLICES> {
     if (!Number.isInteger(prefixLength) || prefixLength < 0 || prefixLength > maxPrefixLength) {
         throw new Error(
-            `Invalid CIDR block ${toString()}, prefix length L must be 0 <= L <= ${maxPrefixLength}.`);
+            `Invalid CIDR block ${address.toString()}/${prefixLength}, prefix length L must be 0 <= L <= ${maxPrefixLength}.`);
     }
+
+    // Normalize by zeroing extra bits to the right of the prefix.
+    address = address.mask(prefixLength);
 
     return {
         address,
@@ -64,6 +67,8 @@ export function createCidrBlock<IpAddress extends ToString, CidrBlockSlices>(
         slice(slicePrefixLength: number) {
             return slice(this, slicePrefixLength);
         },
-        toString,
+        toString() {
+            return `${this.address.toString()}/${this.prefixLength}`;
+        },
     };
 }

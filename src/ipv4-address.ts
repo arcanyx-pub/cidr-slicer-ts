@@ -8,8 +8,18 @@ have to be careful and write good tests.
 See, e.g.: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Left_shift
  */
 
+const MIN_INT32 = 1 << 31;
+const MAX_UINT32 = 0xffffffff;
+
 /** IPv4 Address */
 export type Ipv4Address = {
+    /** The uint32 representation of the address. You probably want `toNumber()` instead.
+     *
+     * `uintVal` is a JavaScript `number` that we interpret as unsigned, even though JavaScript
+     * considers it a two's-complement signed int32. So if you print it, it will be in the range
+     * of [-2^31, 2^31).
+     */
+    readonly uintValue: number,
     /** Apply a mask using the given prefix length. */
     readonly mask: (prefixLength: number) => Ipv4Address,
     /** Convert to canonical string format, e.g., "192.0.2.0". */
@@ -43,14 +53,16 @@ export function ipv4AddressFromString(addrStr: string): Ipv4Address {
 
 /** Create an Ipv4Address from its numeric representation.
  *
- * `intValue` can be a number in [0, 2^32), and external users of this API will almost certainly
+ * `uintValue` can be a number in [0, 2^32), and external users of this API will almost certainly
  * want it to be. However, you can also pass an int32-style number in [-2^31, 2^31), which we treat
  * as an unsigned integer.
  */
-export function ipv4AddressFromInt(intValue: number): Ipv4Address {
-    checkBounds(intValue);
+export function ipv4AddressFromInt(uintValue: number): Ipv4Address {
+    checkBounds(uintValue);
 
     return {
+        uintValue,
+
         mask(prefixLength: number) {
             if (!Number.isInteger(prefixLength) || prefixLength < 0 || prefixLength > 32) {
                 throw new Error(`Invalid mask prefix length: ${prefixLength}`);
@@ -60,31 +72,35 @@ export function ipv4AddressFromInt(intValue: number): Ipv4Address {
             }
             // We make a mask by starting with a single leftmost 1-bit and doing a signed shift.
             const mask = MIN_INT32 >> (prefixLength - 1);
-            const newVal = intValue & mask;
+            const newVal = this.uintValue & mask;
 
             return ipv4AddressFromInt(newVal);
         },
 
-        toString: () => ipv4ToCanonicalString(intValue),
-        toNumber: () => (intValue + MAX_UINT32) % MAX_UINT32,
+        toString() {
+            return ipv4ToCanonicalString(this.uintValue);
+        },
+
+        toNumber() {
+            // Convert from [-2^31, 2^32) to [0, 2^32)
+            return (this.uintValue + MAX_UINT32) % MAX_UINT32;
+        },
+
     };
 }
 
-function ipv4ToCanonicalString(addrVal: number): string {
-    checkBounds(addrVal);
+function ipv4ToCanonicalString(uintVal: number): string {
+    checkBounds(uintVal);
 
     const groups = Array<number>(4);
     const octetMask = 0xff;
     for (let i = 3; i >= 0; i--) {
-        groups[i] = Number(addrVal & octetMask);
-        addrVal >>= 8;
+        groups[i] = Number(uintVal & octetMask);
+        uintVal >>= 8;
     }
 
     return groups.join(".");
 }
-
-const MIN_INT32 = 1 << 31;
-const MAX_UINT32 = 0xffffffff;
 
 // Since we are (ab)using the signed 32-bit representation of JavaScript's "number", any int
 // with a most significant bit of 1 will be negative as far as '<' and '>' are concerned. We
