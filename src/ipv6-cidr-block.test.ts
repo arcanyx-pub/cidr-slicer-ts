@@ -57,6 +57,20 @@ describe("Ipv6CidrBlock", () => {
         expect(slices.get(255n).toString()).toBe("0:2:3:ff00::/56");
     });
 
+    describe("ipv6CidrBlockFromString: normalizes by removing extra bits", () => {
+        const testNormalize = (str: string, expected: string, description?: string) =>
+            test(
+                `${str} => ${expected} ${description ?? ""}`,
+                () => expect(ipv6CidrBlockFromString(str).toString()).toBe(expected));
+
+        const maxAddr = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff";
+        testNormalize(`${maxAddr}/0`, "::/0");
+        testNormalize(`${maxAddr}/1`, "8000::/1");
+        testNormalize(`${maxAddr}/16`, "ffff::/16");
+        testNormalize(`${maxAddr}/64`, "ffff:ffff:ffff:ffff::/64");
+        // 64 is the max allowed prefix for Ipv6CidrBlock; otherwise it throws an error.
+    });
+
     test("slices.get(i) throws error for out-of-bounds i", () => {
         const block = ipv6CidrBlockFromString("::/64");
         const slices = block.slice(64);
