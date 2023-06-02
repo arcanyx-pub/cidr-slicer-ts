@@ -34,4 +34,21 @@ describe("Ipv6Address", () => {
         testIntToString(1n << 127n, "8000::");
         testIntToString((1n << 128n) - 1n, "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
     });
+
+    describe("Ipv6Address.mask()", () => {
+        const testMaskedAddress = (addr: string, mask: number, expected: string) =>
+            test(
+                `${addr} masked with /${mask} is ${expected}`,
+                () => expect(ipv6AddressFromString(addr).mask(mask).toString()).toBe(expected));
+
+        testMaskedAddress("::", 0, "::");
+        testMaskedAddress("::", 128, "::");
+
+        const maxAddr = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff";
+        testMaskedAddress(maxAddr, 0, "::");
+        testMaskedAddress(maxAddr, 1, "8000::");
+        testMaskedAddress(maxAddr, 16, "ffff::");
+        testMaskedAddress(maxAddr, 64, "ffff:ffff:ffff:ffff::");
+        testMaskedAddress(maxAddr, 128, maxAddr);
+    });
 });
