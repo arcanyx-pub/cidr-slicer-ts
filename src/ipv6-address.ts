@@ -4,10 +4,14 @@ export interface Ipv6Address {
     readonly bigIntValue: bigint,
     /** Convert to canonical string format, e.g., "2001:db8::1337". */
     readonly toString: () => string,
+    /** Apply a mask using the given prefix length. */
+    readonly mask: (prefixLength: number) => Ipv6Address,
 }
 
+export const ipv6BitLength = 128;
+
 /** Parse an IPv6 address from its canonical string representation. */
-export function ipv6AddressFromString(addrStr: string, maskWithPrefixLength?: number): Ipv6Address {
+export function ipv6AddressFromString(addrStr: string): Ipv6Address {
     if (addrStr.length == 0) {
         throw new Error("Cannot parse empty address");
     }
@@ -30,17 +34,7 @@ export function ipv6AddressFromString(addrStr: string, maskWithPrefixLength?: nu
     const allGroups = [...preElisionGroups, ...elidedGroups, ...postElisionGroups];
 
     // If any of the groups weren't valid hex, then an error will be thrown here.
-    let bigIntValue = BigInt("0x".concat(allGroups.join("")));
-
-    if (maskWithPrefixLength !== undefined) {
-        const prefixLength = BigInt(maskWithPrefixLength);
-        if (prefixLength < 0 || prefixLength > 64) {
-            throw new Error(`Invalid prefix length: ${maskWithPrefixLength}`);
-        }
-        const bitsToWipeOut = 128n - prefixLength;
-        bigIntValue >>= bitsToWipeOut;
-        bigIntValue <<= bitsToWipeOut;
-    }
+    const bigIntValue = BigInt("0x".concat(allGroups.join("")));
 
     return ipv6AddressFromBigInt(bigIntValue);
 }
@@ -49,7 +43,24 @@ export function ipv6AddressFromString(addrStr: string, maskWithPrefixLength?: nu
 export function ipv6AddressFromBigInt(bigIntValue: bigint): Ipv6Address {
     return {
         bigIntValue,
-        toString: () => ipV6ToCanonicalString(bigIntValue),
+        toString() {
+            return ipV6ToCanonicalString(bigIntValue);
+        },
+        mask(prefixLength: number) {
+            if (!Number.isInteger(prefixLength) ||
+                prefixLength <
+                0 ||
+                prefixLength >
+                ipv6BitLength) {
+                throw new Error(`Invalid prefix length: ${prefixLength}`);
+            }
+            const bitsToWipeOut = BigInt(ipv6BitLength - prefixLength);
+            let newVal = this.bigIntValue;
+            newVal >>= bitsToWipeOut;
+            newVal <<= bitsToWipeOut;
+
+            return ipv6AddressFromBigInt(newVal);
+        }
     };
 }
 
@@ -95,8 +106,8 @@ function ipV6ToCanonicalString(addr: bigint): string {
     }
 
     return groupStrs.slice(0, longestZeroStart).join(":")
-    .concat("::")
-    .concat(groupStrs.slice(longestZeroStart + longestZeroLength).join(":"));
+        .concat("::")
+        .concat(groupStrs.slice(longestZeroStart + longestZeroLength).join(":"));
 }
 
 function splitIntoGroups(partialAddrStr: string | undefined) {
