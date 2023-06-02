@@ -1,13 +1,14 @@
 {
   "name": "@arcanyx/cidr-slicer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Lib for partitioning IPv4 and IPv6 CIDR blocks into smaller slices.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc --project tsconfig.build.json --listEmittedFiles",
     "test": "jest --verbose",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "publish": "npm run build && npm publish"
   },
   "repository": {
     "type": "git",
