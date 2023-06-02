@@ -6,7 +6,7 @@ describe("Ipv4Address", () => {
         const testParseAndReconstruct = (str: string, description?: string) =>
               test(
                     `${description || "parses and reconstructs"}: "${str}"`,
-                    () => expect(ipv4AddressFromString(str).toCanonicalString()).toBe(str));
+                    () => expect(ipv4AddressFromString(str).toString()).toBe(str));
 
         testParseAndReconstruct("0.0.0.0");
         testParseAndReconstruct("0.0.0.1");
@@ -19,7 +19,7 @@ describe("Ipv4Address", () => {
         const testIntToString = (intVal: number, strVal: string, description?: string) =>
               test(
                   `${intVal} => "${strVal}"` + (description ? ` (${description})` : ""),
-                  () => expect(ipv4AddressFromInt(intVal).toCanonicalString()).toBe(strVal));
+                  () => expect(ipv4AddressFromInt(intVal).toString()).toBe(strVal));
 
         const MAX_UINT32 = 0xffffffff;
         const MIN_INT32 = 1 << 31;
@@ -44,7 +44,7 @@ describe("Ipv4Address", () => {
         const testMaskedAddress = (addr: string, mask: number, expected: string) =>
             test(
                 `${addr} masked with /${mask} is ${expected}`,
-                () => expect(ipv4AddressFromString(addr).mask(mask).toCanonicalString()).toBe(expected));
+                () => expect(ipv4AddressFromString(addr).mask(mask).toString()).toBe(expected));
 
         testMaskedAddress("0.0.0.0", 0, "0.0.0.0");
         testMaskedAddress("0.0.0.0", 32, "0.0.0.0");

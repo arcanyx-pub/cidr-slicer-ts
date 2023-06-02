@@ -3,12 +3,10 @@ export interface Ipv6Address {
     /** The 128-bit value of the address. */
     readonly bigIntValue: bigint,
     /** Convert to canonical string format, e.g., "2001:db8::1337". */
-    readonly toCanonicalString: () => string,
+    readonly toString: () => string,
 }
 
 /** Parse an IPv6 address from its canonical string representation. */
-// Implementation note: We could have used a regex much of this string parsing, but readability
-// suffers, complexity is higher, and it's unlikely that performance is much better, if at all.
 export function ipv6AddressFromString(addrStr: string, maskWithPrefixLength?: number): Ipv6Address {
     if (addrStr.length == 0) {
         throw new Error("Cannot parse empty address");
@@ -50,16 +48,15 @@ export function ipv6AddressFromString(addrStr: string, maskWithPrefixLength?: nu
 /** Create an Ipv6Address from its 128-bit representation. */
 export function ipv6AddressFromBigInt(bigIntValue: bigint): Ipv6Address {
     return {
-        // If any of the groups weren't valid hex, then an error will be thrown here.
         bigIntValue,
-        toCanonicalString: () => ipV6ToCanonicalString(bigIntValue),
+        toString: () => ipV6ToCanonicalString(bigIntValue),
     };
 }
 
 function ipV6ToCanonicalString(addr: bigint): string {
     // Break the 128-bit BigInt into 8 hextet groups.
     const hextetMask = 0xffffn;
-    const groups: number[] = Array<number>(8);
+    const groups = Array<number>(8);
     for (let i = 7; i >= 0; i--) {
         groups[i] = Number(addr & hextetMask);
         addr >>= 16n;

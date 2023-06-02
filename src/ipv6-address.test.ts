@@ -6,7 +6,7 @@ describe("Ipv6Address", () => {
         const testParseAndReconstruct = (str: string, description?: string) =>
               test(
                     `${description || "parses and reconstructs"}: "${str}"`,
-                    () => expect(ipv6AddressFromString(str).toCanonicalString()).toBe(str));
+                    () => expect(ipv6AddressFromString(str).toString()).toBe(str));
 
         testParseAndReconstruct("::");
         testParseAndReconstruct("::1");
@@ -23,7 +23,7 @@ describe("Ipv6Address", () => {
         const testIntToString = (intVal: bigint, strVal: string) =>
               test(
                     `${intVal} => "${strVal}"`,
-                    () => expect(ipv6AddressFromBigInt(intVal).toCanonicalString()).toBe(strVal));
+                    () => expect(ipv6AddressFromBigInt(intVal).toString()).toBe(strVal));
 
         testIntToString(0n, "::");
         testIntToString(1n, "::1");
