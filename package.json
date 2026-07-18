@@ -48,6 +48,9 @@
     ],
     "author": "Joe Dahlquist <joe@arcanyx.com>",
     "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    },
     "devDependencies": {
         "@arcanyx/biome-config": "^0.1.2",
         "@biomejs/biome": "^2.5.3",
