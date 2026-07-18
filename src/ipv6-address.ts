@@ -1,11 +1,11 @@
 /** IPv6 Address */
 export interface Ipv6Address {
-    /** The 128-bit value of the address. */
-    readonly bigIntValue: bigint;
     /** Convert to canonical string format, e.g., "2001:db8::1337". */
     readonly toString: () => string;
     /** Apply a mask using the given prefix length. */
     readonly mask: (prefixLength: number) => Ipv6Address;
+    /** Returns the 128-bit numeric value as a `bigint`, in the range [0, 2^128). */
+    readonly toBigInt: () => bigint;
 }
 
 export const ipv6BitLength = 128;
@@ -57,10 +57,13 @@ export function ipv6AddressFromString(addrStr: string): Ipv6Address {
     return ipv6AddressFromBigInt(bigIntValue);
 }
 
-/** Create an Ipv6Address from its 128-bit representation. */
+/** Create an Ipv6Address from its 128-bit representation.
+ *
+ * The value is kept in this closure rather than exposed as a property, so callers only see it
+ * through toBigInt().
+ */
 export function ipv6AddressFromBigInt(bigIntValue: bigint): Ipv6Address {
     return {
-        bigIntValue,
         toString() {
             return ipV6ToCanonicalString(bigIntValue);
         },
@@ -73,11 +76,14 @@ export function ipv6AddressFromBigInt(bigIntValue: bigint): Ipv6Address {
                 throw new Error(`Invalid prefix length: ${prefixLength}`);
             }
             const bitsToWipeOut = BigInt(ipv6BitLength - prefixLength);
-            let newVal = this.bigIntValue;
+            let newVal = bigIntValue;
             newVal >>= bitsToWipeOut;
             newVal <<= bitsToWipeOut;
 
             return ipv6AddressFromBigInt(newVal);
+        },
+        toBigInt() {
+            return bigIntValue;
         },
     };
 }

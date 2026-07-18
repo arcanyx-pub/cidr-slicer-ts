@@ -67,6 +67,20 @@ describe("Ipv6Address", () => {
         testIntToString((1n << 128n) - 1n, "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
     });
 
+    describe("Ipv6Address.toBigInt()", () => {
+        test('"::" => 0n', () => expect(ipv6AddressFromString("::").toBigInt()).toBe(0n));
+        test('"::1" => 1n', () => expect(ipv6AddressFromString("::1").toBigInt()).toBe(1n));
+        test("2001:db8:: => full 128-bit value", () =>
+            expect(ipv6AddressFromString("2001:db8::").toBigInt()).toBe(
+                42540766411282592856903984951653826560n,
+            ));
+
+        // Round-trips the value handed to the constructor.
+        for (const v of [0n, 1n, (1n << 64n) + 7n, (1n << 128n) - 1n]) {
+            test(`round-trips ${v}`, () => expect(ipv6AddressFromBigInt(v).toBigInt()).toBe(v));
+        }
+    });
+
     describe("Ipv6Address.mask()", () => {
         const testMaskedAddress = (addr: string, mask: number, expected: string) =>
             test(`${addr} masked with /${mask} is ${expected}`, () =>
