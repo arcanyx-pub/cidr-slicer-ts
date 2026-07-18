@@ -82,8 +82,11 @@ export function ipv4AddressFromInt(uintValue: number): Ipv4Address {
         },
 
         toNumber() {
-            // Convert from [-2^31, 2^32) to [0, 2^32)
-            return (this.uintValue + MAX_UINT32) % MAX_UINT32;
+            // Reinterpret the stored value as an unsigned 32-bit int in [0, 2^32).
+            // `>>> 0` coerces to Uint32, canonicalizing both the signed (e.g. -1)
+            // and already-unsigned (e.g. 0xffffffff) representations of the same
+            // address to the same non-negative number.
+            return this.uintValue >>> 0;
         },
     };
 }
