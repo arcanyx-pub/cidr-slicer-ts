@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { ipv4CidrBlockFromString } from "./ipv4-cidr-block";
+import { ipv4CidrBlockFromString } from "./ipv4-cidr-block.js";
 
 describe("Ipv4CidrBlock", () => {
     describe("ipv4CidrBlockFromString: parses and reconstructs canonical strings", () => {

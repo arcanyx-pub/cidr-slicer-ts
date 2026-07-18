@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { ipv6CidrBlockFromString } from "./ipv6-cidr-block";
+import { ipv6CidrBlockFromString } from "./ipv6-cidr-block.js";
 
 describe("Ipv6CidrBlock", () => {
     test("parses '::'", () => {

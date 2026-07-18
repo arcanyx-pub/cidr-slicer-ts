@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { ipv4AddressFromInt, ipv4AddressFromString } from "./ipv4-address";
+import { ipv4AddressFromInt, ipv4AddressFromString } from "./ipv4-address.js";
 
 describe("Ipv4Address", () => {
     describe("ipv4AddressFromString", () => {

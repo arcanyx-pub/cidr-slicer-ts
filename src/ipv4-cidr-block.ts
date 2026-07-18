@@ -1,5 +1,5 @@
-import { type CidrBlock, cidrBlockFromString, createCidrBlock } from "./cidr-block";
-import { type Ipv4Address, ipv4AddressFromInt, ipv4AddressFromString } from "./ipv4-address";
+import { type CidrBlock, cidrBlockFromString, createCidrBlock } from "./cidr-block.js";
+import { type Ipv4Address, ipv4AddressFromInt, ipv4AddressFromString } from "./ipv4-address.js";
 
 /** An IPv4 CIDR Block that has been sliced into smaller blocks. */
 export interface Ipv4CidrBlockSlices {

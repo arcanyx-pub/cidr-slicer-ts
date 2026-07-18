@@ -1,5 +1,5 @@
-import { type CidrBlock, cidrBlockFromString, createCidrBlock } from "./cidr-block";
-import { type Ipv6Address, ipv6AddressFromBigInt, ipv6AddressFromString } from "./ipv6-address";
+import { type CidrBlock, cidrBlockFromString, createCidrBlock } from "./cidr-block.js";
+import { type Ipv6Address, ipv6AddressFromBigInt, ipv6AddressFromString } from "./ipv6-address.js";
 
 /** An IPv6 CIDR Block that has been sliced into smaller blocks. */
 export interface Ipv6CidrBlockSlices {
