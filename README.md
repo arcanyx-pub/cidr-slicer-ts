@@ -46,15 +46,15 @@ Features:
 ### Slice IPv6 CIDR Blocks into smaller blocks.
 
 ```typescript
-import {ipv6CidrBlockFromString} from "cidr-slicer";
+import {ipv6CidrBlockFromString} from "@arcanyx/cidr-slicer";
 
 // Slice a /56 block into /64 block slices.
-const block = ipv6CidrBlockFromString("2001:db8::/56");  // Type: CidrBlock<Ipv6Address>
+const block = ipv6CidrBlockFromString("2001:db8::/56");  // Type: CidrBlock<Ipv6Address, Ipv6CidrBlockSlices>
 const slices = block.slice(64);  // Type: Ipv6CidrBlockSlices
 
 for (let i = 0n; i < slices.length; i++) {
    // Get and print the i'th block slice.
-    const slice = slices.get(i);  // Type: CidrBlock<Ipv6Address>
+    const slice = slices.get(i);  // Type: CidrBlock<Ipv6Address, Ipv6CidrBlockSlices>
     console.log(`slice ${i}: ${slice}`);
 }
 // Console output:
@@ -64,17 +64,3 @@ for (let i = 0n; i < slices.length; i++) {
 //  [...]
 //  slice 255: 2001:db8:0:ff::/64
 ```
-
-## Use Cases
-
-### Assigning IPv6 blocks to AWS subnets with AWS CDK
-
-TODO: Write this section
-
-### Assigning IPv6 blocks to AWS subnets with Pulumi
-
-TODO: Write this section
-
-### Assigning IPv6 blocks to AWS subnets with CDKTF (CDK for Terraform)
-
-TODO: Write this section
