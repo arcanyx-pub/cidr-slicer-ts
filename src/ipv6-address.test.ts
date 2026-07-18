@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { ipv6AddressFromBigInt, ipv6AddressFromString } from "./ipv6-address";
+import { ipv6AddressFromBigInt, ipv6AddressFromString } from "./ipv6-address.js";
 
 describe("Ipv6Address", () => {
     describe("ipv6AddressFromString", () => {

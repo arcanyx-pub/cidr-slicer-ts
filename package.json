@@ -2,18 +2,39 @@
     "name": "@arcanyx/cidr-slicer",
     "version": "0.3.0",
     "description": "Lib for partitioning IPv4 and IPv6 CIDR blocks into smaller slices.",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "type": "module",
+    "exports": {
+        ".": {
+            "import": {
+                "types": "./dist/esm/index.d.ts",
+                "default": "./dist/esm/index.js"
+            },
+            "require": {
+                "types": "./dist/cjs/index.d.ts",
+                "default": "./dist/cjs/index.js"
+            }
+        },
+        "./package.json": "./package.json"
+    },
+    "main": "./dist/cjs/index.js",
+    "module": "./dist/esm/index.js",
+    "types": "./dist/esm/index.d.ts",
+    "files": [
+        "dist"
+    ],
     "engines": {
         "node": ">=22"
     },
     "scripts": {
         "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
-        "build": "npm run clean && tsc --project tsconfig.build.json",
+        "build:esm": "tsc -p tsconfig.esm.json",
+        "build:cjs": "tsc -p tsconfig.cjs.json",
+        "build": "npm run clean && npm run build:esm && npm run build:cjs && node scripts/finalize-dist.mjs",
         "typecheck": "tsc --noEmit",
         "test": "vitest run",
         "lint": "biome check",
-        "format": "biome check --write"
+        "format": "biome check --write",
+        "check:exports": "node scripts/check-exports.mjs"
     },
     "repository": {
         "type": "git",
