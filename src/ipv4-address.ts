@@ -19,18 +19,18 @@ export type Ipv4Address = {
      * considers it a two's-complement signed int32. So if you print it, it will be in the range
      * of [-2^31, 2^31).
      */
-    readonly uintValue: number,
+    readonly uintValue: number;
     /** Apply a mask using the given prefix length. */
-    readonly mask: (prefixLength: number) => Ipv4Address,
+    readonly mask: (prefixLength: number) => Ipv4Address;
     /** Convert to canonical string format, e.g., "192.0.2.0". */
-    readonly toString: () => string,
+    readonly toString: () => string;
     /** Returns the numeric representation, in the range [0, 2^32) */
-    readonly toNumber: () => number,
+    readonly toNumber: () => number;
 };
 
 /** Parse an IPv4 address from its canonical string representation. */
 export function ipv4AddressFromString(addrStr: string): Ipv4Address {
-    if (addrStr.length == 0) {
+    if (addrStr.length === 0) {
         throw new Error("Cannot parse empty address");
     }
 
@@ -45,7 +45,7 @@ export function ipv4AddressFromString(addrStr: string): Ipv4Address {
         if (!Number.isInteger(num) || num < 0 || num >= 256) {
             throw new Error(`Cannot parse malformed "${addrStr}", groups must be 0 <= g < 256.`);
         }
-        addrInt |= (num << ((3 - i) * 8));
+        addrInt |= num << ((3 - i) * 8);
     }
 
     return ipv4AddressFromInt(addrInt);
@@ -85,7 +85,6 @@ export function ipv4AddressFromInt(uintValue: number): Ipv4Address {
             // Convert from [-2^31, 2^32) to [0, 2^32)
             return (this.uintValue + MAX_UINT32) % MAX_UINT32;
         },
-
     };
 }
 

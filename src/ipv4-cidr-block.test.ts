@@ -1,13 +1,11 @@
-import {ipv4CidrBlockFromString} from "./ipv4-cidr-block";
-import {describe, expect, test} from "@jest/globals";
+import { describe, expect, test } from "vitest";
+import { ipv4CidrBlockFromString } from "./ipv4-cidr-block";
 
 describe("Ipv4CidrBlock", () => {
-
     describe("ipv4CidrBlockFromString: parses and reconstructs canonical strings", () => {
         const testParseAndReconstruct = (str: string, description?: string) =>
-            test(
-                `${str} ${description ?? ""}`,
-                () => expect(ipv4CidrBlockFromString(str).toString()).toBe(str));
+            test(`${str} ${description ?? ""}`, () =>
+                expect(ipv4CidrBlockFromString(str).toString()).toBe(str));
 
         testParseAndReconstruct("0.0.0.0/0");
         testParseAndReconstruct("0.0.0.0/16");
@@ -25,9 +23,8 @@ describe("Ipv4CidrBlock", () => {
 
     describe("ipv4CidrBlockFromString: normalizes by removing extra bits", () => {
         const testNormalize = (str: string, expected: string, description?: string) =>
-            test(
-                `${str} => ${expected} ${description ?? ""}`,
-                () => expect(ipv4CidrBlockFromString(str).toString()).toBe(expected));
+            test(`${str} => ${expected} ${description ?? ""}`, () =>
+                expect(ipv4CidrBlockFromString(str).toString()).toBe(expected));
 
         testNormalize("255.255.255.255/0", "0.0.0.0/0");
         testNormalize("255.255.255.255/8", "255.0.0.0/8");
@@ -37,7 +34,6 @@ describe("Ipv4CidrBlock", () => {
     });
 
     describe("slicing", () => {
-
         test("parses and slices '255.255.255.255/32' into one /32 block", () => {
             const block = ipv4CidrBlockFromString("255.255.255.255/32");
             expect(block.toString()).toBe("255.255.255.255/32");
@@ -99,7 +95,6 @@ describe("Ipv4CidrBlock", () => {
             expect(slices.get(1).toString()).toBe("255.255.1.0/24");
             expect(slices.get(255).toString()).toBe("255.255.255.0/24");
         });
-
 
         test("slices.get(i) throws error for out-of-bounds i", () => {
             const block = ipv4CidrBlockFromString("0.0.0.0/32");

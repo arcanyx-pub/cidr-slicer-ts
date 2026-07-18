@@ -1,18 +1,18 @@
 /** IPv6 Address */
 export interface Ipv6Address {
     /** The 128-bit value of the address. */
-    readonly bigIntValue: bigint,
+    readonly bigIntValue: bigint;
     /** Convert to canonical string format, e.g., "2001:db8::1337". */
-    readonly toString: () => string,
+    readonly toString: () => string;
     /** Apply a mask using the given prefix length. */
-    readonly mask: (prefixLength: number) => Ipv6Address,
+    readonly mask: (prefixLength: number) => Ipv6Address;
 }
 
 export const ipv6BitLength = 128;
 
 /** Parse an IPv6 address from its canonical string representation. */
 export function ipv6AddressFromString(addrStr: string): Ipv6Address {
-    if (addrStr.length == 0) {
+    if (addrStr.length === 0) {
         throw new Error("Cannot parse empty address");
     }
     // Split on the elision separator (::), if any.
@@ -47,11 +47,11 @@ export function ipv6AddressFromBigInt(bigIntValue: bigint): Ipv6Address {
             return ipV6ToCanonicalString(bigIntValue);
         },
         mask(prefixLength: number) {
-            if (!Number.isInteger(prefixLength) ||
-                prefixLength <
-                0 ||
-                prefixLength >
-                ipv6BitLength) {
+            if (
+                !Number.isInteger(prefixLength) ||
+                prefixLength < 0 ||
+                prefixLength > ipv6BitLength
+            ) {
                 throw new Error(`Invalid prefix length: ${prefixLength}`);
             }
             const bitsToWipeOut = BigInt(ipv6BitLength - prefixLength);
@@ -60,7 +60,7 @@ export function ipv6AddressFromBigInt(bigIntValue: bigint): Ipv6Address {
             newVal <<= bitsToWipeOut;
 
             return ipv6AddressFromBigInt(newVal);
-        }
+        },
     };
 }
 
@@ -79,13 +79,13 @@ function ipV6ToCanonicalString(addr: bigint): string {
     let longestZeroLength = 0;
     let longestZeroStart = -1;
     for (let i = 0; i < 8; i++) {
-        if (groups[i] != 0) {
+        if (groups[i] !== 0) {
             // If not zero, then continue (thus breaking the sequence).
             continue;
         }
 
         // Set zeroStart if we are starting a new sequence of zeros.
-        if (zeroEnd != i) {
+        if (zeroEnd !== i) {
             zeroStart = i;
         }
         // Advance zeroEnd.
@@ -105,7 +105,9 @@ function ipV6ToCanonicalString(addr: bigint): string {
         return groupStrs.join(":");
     }
 
-    return groupStrs.slice(0, longestZeroStart).join(":")
+    return groupStrs
+        .slice(0, longestZeroStart)
+        .join(":")
         .concat("::")
         .concat(groupStrs.slice(longestZeroStart + longestZeroLength).join(":"));
 }
@@ -119,7 +121,7 @@ function splitIntoGroups(partialAddrStr: string | undefined) {
 
     // Return normalized groups w/ 4 chars each.
     return groups.map(group => {
-        if (group.length == 0) {
+        if (group.length === 0) {
             throw new Error("Encountered empty hextet group");
         }
         if (group.length > 4) {
