@@ -80,12 +80,27 @@ describe("Ipv4Address", () => {
         testInt(-1, 4294967295, "-1 => max uint32");
         testInt(1 << 31, 2147483648, "min int32 => 2^31");
 
-        // toNumber() is canonical: both stored representations of the same address agree.
+        // toNumber() is canonical: both constructors normalize to the same value.
         test("canonicalizes signed and unsigned representations", () => {
-            const fromStr = ipv4AddressFromString("255.255.255.255"); // stored as -1
-            const fromInt = ipv4AddressFromInt(0xffffffff); // stored as 4294967295
+            const fromStr = ipv4AddressFromString("255.255.255.255");
+            const fromInt = ipv4AddressFromInt(0xffffffff);
             expect(fromStr.toNumber()).toBe(fromInt.toNumber());
             expect(fromStr.toNumber()).toBe(4294967295);
         });
+    });
+
+    describe("Ipv4Address.toBigInt()", () => {
+        const testStr = (addr: string, expected: bigint) =>
+            test(`${addr} => ${expected}`, () =>
+                expect(ipv4AddressFromString(addr).toBigInt()).toBe(expected));
+
+        testStr("0.0.0.0", 0n);
+        testStr("0.0.0.5", 5n);
+        testStr("128.0.0.0", 2147483648n);
+        testStr("192.168.0.1", 3232235521n);
+        testStr("255.255.255.255", 4294967295n);
+
+        // Int32-style (negative) input is reinterpreted as unsigned, same as toNumber().
+        test("-1 => max uint32", () => expect(ipv4AddressFromInt(-1).toBigInt()).toBe(4294967295n));
     });
 });

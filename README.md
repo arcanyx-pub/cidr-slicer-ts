@@ -14,7 +14,7 @@ Features:
  - Parse IP addresses:
    ```typescript
    ipv6AddressFromString("2001:db8::").toString()  // "2001:db8::"
-   ipv6AddressFromString("2001:db8::").bigIntValue // 42540766411282592856903984951653826560n
+   ipv6AddressFromString("2001:db8::").toBigInt() // 42540766411282592856903984951653826560n
    ```
    
  - Mask IP addresses w/ a prefix length:

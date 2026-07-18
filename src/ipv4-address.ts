@@ -13,19 +13,14 @@ const MAX_UINT32 = 0xffffffff;
 
 /** IPv4 Address */
 export type Ipv4Address = {
-    /** The uint32 representation of the address. You probably want `toNumber()` instead.
-     *
-     * `uintVal` is a JavaScript `number` that we interpret as unsigned, even though JavaScript
-     * considers it a two's-complement signed int32. So if you print it, it will be in the range
-     * of [-2^31, 2^31).
-     */
-    readonly uintValue: number;
     /** Apply a mask using the given prefix length. */
     readonly mask: (prefixLength: number) => Ipv4Address;
     /** Convert to canonical string format, e.g., "192.0.2.0". */
     readonly toString: () => string;
-    /** Returns the numeric representation, in the range [0, 2^32) */
+    /** Returns the numeric value as a `number`, in the range [0, 2^32). */
     readonly toNumber: () => number;
+    /** Returns the numeric value as a `bigint`, in the range [0, 2^32). */
+    readonly toBigInt: () => bigint;
 };
 
 /** Parse an IPv4 address from its canonical string representation. */
@@ -60,9 +55,13 @@ export function ipv4AddressFromString(addrStr: string): Ipv4Address {
 export function ipv4AddressFromInt(uintValue: number): Ipv4Address {
     checkBounds(uintValue);
 
-    return {
-        uintValue,
+    // Store the canonical unsigned representation in [0, 2^32). `>>> 0` coerces to Uint32,
+    // mapping int32-style inputs (e.g. -1) and already-unsigned inputs (e.g. 0xffffffff) for the
+    // same address to the same non-negative number. The raw value is kept in this closure rather
+    // than exposed as a property, so callers only see it through toNumber()/toBigInt().
+    const value = uintValue >>> 0;
 
+    return {
         mask(prefixLength: number) {
             if (!Number.isInteger(prefixLength) || prefixLength < 0 || prefixLength > 32) {
                 throw new Error(`Invalid mask prefix length: ${prefixLength}`);
@@ -72,21 +71,20 @@ export function ipv4AddressFromInt(uintValue: number): Ipv4Address {
             }
             // We make a mask by starting with a single leftmost 1-bit and doing a signed shift.
             const mask = MIN_INT32 >> (prefixLength - 1);
-            const newVal = this.uintValue & mask;
 
-            return ipv4AddressFromInt(newVal);
+            return ipv4AddressFromInt(value & mask);
         },
 
         toString() {
-            return ipv4ToCanonicalString(this.uintValue);
+            return ipv4ToCanonicalString(value);
         },
 
         toNumber() {
-            // Reinterpret the stored value as an unsigned 32-bit int in [0, 2^32).
-            // `>>> 0` coerces to Uint32, canonicalizing both the signed (e.g. -1)
-            // and already-unsigned (e.g. 0xffffffff) representations of the same
-            // address to the same non-negative number.
-            return this.uintValue >>> 0;
+            return value;
+        },
+
+        toBigInt() {
+            return BigInt(value);
         },
     };
 }

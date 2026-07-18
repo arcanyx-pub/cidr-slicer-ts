@@ -43,7 +43,7 @@ function createSlices(
                 throw new Error(`Out-of-bounds: check failed: 0 <= ${i} < ${this.length} slices`);
             }
             const suffixAddrVal = i << (maxBitsLength - slicePrefixLength);
-            const sliceAddrVal = block.address.uintValue | suffixAddrVal;
+            const sliceAddrVal = block.address.toNumber() | suffixAddrVal;
 
             return createCidrBlock(
                 ipv4AddressFromInt(sliceAddrVal),
