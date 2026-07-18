@@ -17,6 +17,41 @@ describe("Ipv6Address", () => {
         testParseAndReconstruct("1::4:0:0:7:8", "elides the 1st of equal-length sets of zeros");
     });
 
+    describe("ipv6AddressFromString: accepts valid boundary forms", () => {
+        // "::" eliding exactly one group, with the maximum 7 groups written out
+        // across it (2 before, 5 after).
+        test('expands a 7-group address split across "::"', () =>
+            expect(ipv6AddressFromString("1:2::4:5:6:7:8").toString()).toBe("1:2:0:4:5:6:7:8"));
+        // All 8 groups written out, no elision.
+        test("accepts a full 8-group address with no elision", () =>
+            expect(ipv6AddressFromString("1:2:3:4:5:6:7:8").toString()).toBe("1:2:3:4:5:6:7:8"));
+    });
+
+    describe("ipv6AddressFromString: rejects malformed input", () => {
+        const testRejects = (str: string, messagePart: string, description: string) =>
+            test(description, () => expect(() => ipv6AddressFromString(str)).toThrow(messagePart));
+
+        testRejects("", "empty", "empty string");
+        // No "::": all 8 groups must be written out explicitly.
+        testRejects("1:2:3", "expected 8 groups", "too few groups, no elision");
+        testRejects("dead:beef", "expected 8 groups", "far too few groups, no elision");
+        testRejects("1:2:3:4:5:6:7", "expected 8 groups", "seven groups, no elision");
+        // More than 8 groups is a wrong count, rejected with the same clear message.
+        testRejects("1:2:3:4:5:6:7:8:9", "expected 8 groups", "nine groups, no elision");
+        // "::" must elide at least one group, so <= 7 may be written out.
+        testRejects(
+            "1:2:3:4:5:6:7:8::",
+            "must elide at least one group",
+            "eight groups plus a redundant ::",
+        );
+        testRejects(
+            "1:2:3:4:5:6:7:8:9::",
+            "must elide at least one group",
+            "over-full with elision",
+        );
+        testRejects("a::b::c", "more than one", "two elisions");
+    });
+
     describe("ipv6AddressFromBigInt", () => {
         const testIntToString = (intVal: bigint, strVal: string) =>
             test(`${intVal} => "${strVal}"`, () =>

@@ -10,6 +10,9 @@ export interface Ipv6Address {
 
 export const ipv6BitLength = 128;
 
+/** An IPv6 address is eight 16-bit hextet groups. */
+const ipv6GroupCount = 8;
+
 /** Parse an IPv6 address from its canonical string representation. */
 export function ipv6AddressFromString(addrStr: string): Ipv6Address {
     if (addrStr.length === 0) {
@@ -25,12 +28,27 @@ export function ipv6AddressFromString(addrStr: string): Ipv6Address {
     const preElisionGroups = splitIntoGroups(preElision);
     const postElisionGroups = splitIntoGroups(postElision);
     const totalSpecifiedGroups = preElisionGroups.length + postElisionGroups.length;
-    if (postElisionGroups.length > 0 && totalSpecifiedGroups > 6) {
-        throw new Error(`Cannot parse malformed "${addrStr}", invalid use of elision (::).`);
+
+    // `postElision` is defined iff the input contained a "::".
+    const hasElision = postElision !== undefined;
+    if (hasElision) {
+        // "::" elides one or more all-zero groups, so at most 7 may be written out.
+        if (totalSpecifiedGroups >= ipv6GroupCount) {
+            throw new Error(
+                `Cannot parse malformed "${addrStr}", "::" must elide at least one group but ${totalSpecifiedGroups} of ${ipv6GroupCount} groups were specified.`,
+            );
+        }
+    } else if (totalSpecifiedGroups !== ipv6GroupCount) {
+        // Without "::", all 8 groups must be written out explicitly.
+        throw new Error(
+            `Cannot parse malformed "${addrStr}", expected ${ipv6GroupCount} groups but got ${totalSpecifiedGroups}; use "::" to elide consecutive zero groups.`,
+        );
     }
 
     // Restore the elided 0000 groups to finish reconstructing all 8 groups.
-    const elidedGroups: string[] = Array<string>(8 - totalSpecifiedGroups).fill("0000");
+    const elidedGroups: string[] = Array<string>(ipv6GroupCount - totalSpecifiedGroups).fill(
+        "0000",
+    );
     const allGroups = [...preElisionGroups, ...elidedGroups, ...postElisionGroups];
 
     // If any of the groups weren't valid hex, then an error will be thrown here.
