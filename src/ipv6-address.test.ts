@@ -1,12 +1,11 @@
-import {ipv6AddressFromBigInt, ipv6AddressFromString} from "./ipv6-address";
-import {describe, expect, test} from "@jest/globals";
+import { describe, expect, test } from "vitest";
+import { ipv6AddressFromBigInt, ipv6AddressFromString } from "./ipv6-address";
 
 describe("Ipv6Address", () => {
     describe("ipv6AddressFromString", () => {
         const testParseAndReconstruct = (str: string, description?: string) =>
-              test(
-                    `${description || "parses and reconstructs"}: "${str}"`,
-                    () => expect(ipv6AddressFromString(str).toString()).toBe(str));
+            test(`${description || "parses and reconstructs"}: "${str}"`, () =>
+                expect(ipv6AddressFromString(str).toString()).toBe(str));
 
         testParseAndReconstruct("::");
         testParseAndReconstruct("::1");
@@ -16,14 +15,12 @@ describe("Ipv6Address", () => {
         testParseAndReconstruct("1:0:0:4::8", "elides longest set of zeroes");
         // 1:0:0:4:0:0:7:8
         testParseAndReconstruct("1::4:0:0:7:8", "elides the 1st of equal-length sets of zeros");
-
     });
 
     describe("ipv6AddressFromBigInt", () => {
         const testIntToString = (intVal: bigint, strVal: string) =>
-              test(
-                    `${intVal} => "${strVal}"`,
-                    () => expect(ipv6AddressFromBigInt(intVal).toString()).toBe(strVal));
+            test(`${intVal} => "${strVal}"`, () =>
+                expect(ipv6AddressFromBigInt(intVal).toString()).toBe(strVal));
 
         testIntToString(0n, "::");
         testIntToString(1n, "::1");
@@ -37,9 +34,8 @@ describe("Ipv6Address", () => {
 
     describe("Ipv6Address.mask()", () => {
         const testMaskedAddress = (addr: string, mask: number, expected: string) =>
-            test(
-                `${addr} masked with /${mask} is ${expected}`,
-                () => expect(ipv6AddressFromString(addr).mask(mask).toString()).toBe(expected));
+            test(`${addr} masked with /${mask} is ${expected}`, () =>
+                expect(ipv6AddressFromString(addr).mask(mask).toString()).toBe(expected));
 
         testMaskedAddress("::", 0, "::");
         testMaskedAddress("::", 128, "::");

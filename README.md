@@ -2,7 +2,7 @@ CIDR::/slicer 🔪🍎
 ================
 
 [![npm](https://img.shields.io/npm/v/@arcanyx/cidr-slicer)](https://www.npmjs.com/package/@arcanyx/cidr-slicer)
-[![main](https://github.com/arcanyx-pub/cidr-slicer-ts/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/arcanyx-pub/cidr-slicer-ts/actions?query=branch%3Amain)
+[![main](https://github.com/arcanyx-pub/cidr-slicer-ts/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/arcanyx-pub/cidr-slicer-ts/actions?query=branch%3Amain)
 
 Zero-dependency lib for manipulating IP Addresses & CIDR blocks (IPv4 and IPv6). Written in TypeScript.
 

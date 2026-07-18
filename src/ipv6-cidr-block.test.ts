@@ -1,8 +1,7 @@
-import {describe, expect, test} from "@jest/globals";
-import {ipv6CidrBlockFromString} from "./ipv6-cidr-block";
+import { describe, expect, test } from "vitest";
+import { ipv6CidrBlockFromString } from "./ipv6-cidr-block";
 
 describe("Ipv6CidrBlock", () => {
-
     test("parses '::'", () => {
         expect(ipv6CidrBlockFromString("::/0").toString()).toBe("::/0");
     });
@@ -59,9 +58,8 @@ describe("Ipv6CidrBlock", () => {
 
     describe("ipv6CidrBlockFromString: normalizes by removing extra bits", () => {
         const testNormalize = (str: string, expected: string, description?: string) =>
-            test(
-                `${str} => ${expected} ${description ?? ""}`,
-                () => expect(ipv6CidrBlockFromString(str).toString()).toBe(expected));
+            test(`${str} => ${expected} ${description ?? ""}`, () =>
+                expect(ipv6CidrBlockFromString(str).toString()).toBe(expected));
 
         const maxAddr = "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff";
         testNormalize(`${maxAddr}/0`, "::/0");
@@ -79,5 +77,4 @@ describe("Ipv6CidrBlock", () => {
         expect(() => slices.get(1n)).toThrow("Out-of-bounds");
         expect(() => slices.get(-1n)).toThrow("Out-of-bounds");
     });
-
 });

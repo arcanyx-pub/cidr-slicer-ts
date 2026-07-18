@@ -1,21 +1,21 @@
 interface IpAddress {
-    readonly toString: () => string,
-    readonly mask: (prefixLength: number) => this,
+    readonly toString: () => string;
+    readonly mask: (prefixLength: number) => this;
 }
 
 export interface CidrBlock<IP, SLICES> {
     /** The normalized address, with all bits right of the prefix set to 0. */
-    readonly address: IP,
+    readonly address: IP;
     /** The prefix length specified by the notation, e.g., 60 for "2001:db8::/60". */
-    readonly prefixLength: number,
+    readonly prefixLength: number;
     /**
      * Slice (i.e. partition) the block into smaller sub-blocks of the given slicePrefixLength.
      *
      * slicePrefixLength must be <= block.prefixLength.
      */
-    readonly slice: (slicePrefixLength: number) => SLICES,
+    readonly slice: (slicePrefixLength: number) => SLICES;
     /** Returns the canonical string representation of the CIDR block (with proper elision) */
-    readonly toString: () => string,
+    readonly toString: () => string;
 }
 
 export function cidrBlockFromString<IP extends IpAddress, SLICES>(
@@ -35,7 +35,8 @@ export function cidrBlockFromString<IP extends IpAddress, SLICES>(
     if (prefixLengthStr === undefined || prefixLengthStr.length === 0) {
         const examplePrefixLength = Math.floor(maxPrefixLength / 2);
         throw new Error(
-            `Cannot parse malformed ${block}, prefix length (e.g., /${examplePrefixLength}) was missing.`);
+            `Cannot parse malformed ${block}, prefix length (e.g., /${examplePrefixLength}) was missing.`,
+        );
     }
     const prefixLength = Number(prefixLengthStr);
 
@@ -55,7 +56,8 @@ export function createCidrBlock<IP extends IpAddress, SLICES>(
 ): CidrBlock<IP, SLICES> {
     if (!Number.isInteger(prefixLength) || prefixLength < 0 || prefixLength > maxPrefixLength) {
         throw new Error(
-            `Invalid CIDR block ${address.toString()}/${prefixLength}, prefix length L must be 0 <= L <= ${maxPrefixLength}.`);
+            `Invalid CIDR block ${address.toString()}/${prefixLength}, prefix length L must be 0 <= L <= ${maxPrefixLength}.`,
+        );
     }
 
     // Normalize by zeroing extra bits to the right of the prefix.
