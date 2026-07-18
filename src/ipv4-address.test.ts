@@ -59,4 +59,33 @@ describe("Ipv4Address", () => {
         testMaskedAddress("1.2.3.4", 16, "1.2.0.0");
         testMaskedAddress("1.2.3.4", 32, "1.2.3.4");
     });
+
+    describe("Ipv4Address.toNumber()", () => {
+        const testStr = (addr: string, expected: number) =>
+            test(`${addr} => ${expected}`, () =>
+                expect(ipv4AddressFromString(addr).toNumber()).toBe(expected));
+        const testInt = (intVal: number, expected: number, description: string) =>
+            test(description, () => expect(ipv4AddressFromInt(intVal).toNumber()).toBe(expected));
+
+        // High bit clear: value is already non-negative, no reinterpretation needed.
+        testStr("0.0.0.0", 0);
+        testStr("0.0.0.5", 5);
+
+        // High bit set: must be reinterpreted as unsigned, so the result is >= 2^31.
+        testStr("128.0.0.0", 2147483648);
+        testStr("192.168.0.1", 3232235521);
+        testStr("255.255.255.255", 4294967295);
+
+        // Int32-style (negative) inputs are reinterpreted as unsigned.
+        testInt(-1, 4294967295, "-1 => max uint32");
+        testInt(1 << 31, 2147483648, "min int32 => 2^31");
+
+        // toNumber() is canonical: both stored representations of the same address agree.
+        test("canonicalizes signed and unsigned representations", () => {
+            const fromStr = ipv4AddressFromString("255.255.255.255"); // stored as -1
+            const fromInt = ipv4AddressFromInt(0xffffffff); // stored as 4294967295
+            expect(fromStr.toNumber()).toBe(fromInt.toNumber());
+            expect(fromStr.toNumber()).toBe(4294967295);
+        });
+    });
 });
