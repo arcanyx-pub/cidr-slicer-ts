@@ -1,6 +1,6 @@
 {
     "name": "@arcanyx/cidr-slicer",
-    "version": "0.3.0",
+    "version": "1.0.0",
     "description": "Lib for partitioning IPv4 and IPv6 CIDR blocks into smaller slices.",
     "type": "module",
     "exports": {
