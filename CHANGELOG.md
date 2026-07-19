@@ -4,7 +4,7 @@ Notable changes to `@arcanyx/cidr-slicer`. Format follows
 [Keep a Changelog](https://keepachangelog.com); versions follow
 [SemVer](https://semver.org).
 
-## [Unreleased]
+## [1.0.0] - 2026-07-19
 
 ### Breaking
 
