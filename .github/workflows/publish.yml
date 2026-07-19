@@ -9,6 +9,12 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Scopes the OIDC token to this environment; the npm trusted-publisher config
+    # must name the same environment. Also the place to add release protection
+    # rules (required reviewers, tag restrictions) in repo Settings > Environments.
+    environment:
+      name: release
+      url: https://www.npmjs.com/package/@arcanyx/cidr-slicer
     permissions:
       contents: read
       id-token: write # required for npm trusted publishing (OIDC) + provenance
